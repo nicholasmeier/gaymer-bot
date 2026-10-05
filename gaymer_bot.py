@@ -10,18 +10,12 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-
 debug = False
 ## 
 #
 # Helper Funcs
 #
 ##
-tokenfile = open("token.txt", "r")
-token = tokenfile.read().splitlines()[0]
-if debug:
-    print(token)
-tokenfile.close()
 
 """
 def get_random_game(genre):
@@ -66,4 +60,4 @@ async def on_message(message):
             msg = '{0} BONK! Go to {1}'.format(member.mention, text_channel)
             await message.channel.send(msg)
 
-client.run(token)
+client.run(constants.TOKEN)
