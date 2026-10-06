@@ -20,28 +20,26 @@ debug = True
 ##
 
 
-def get_game(genre):
+def get_game(genre = None):
     if genre == "chill":
-        g_c = random.randrange(0, constants.GAMES_CHILL.len)
+        g_c = random.randrange(0, len(constants.GAMES_CHILL))
         gamechoice = constants.GAMES_CHILL[g_c]
         return gamechoice
     elif genre == "shooter":
-        g_c = random.randrange(0, constants.GAMES_SHOOT.len)
+        g_c = random.randrange(0, len(constants.GAMES_SHOOT))
         gamechoice = constants.GAMES_SHOOT[g_c]
         return gamechoice
     elif genre == "horror":
-        g_c = random.randrange(0, constants.GAMES_HORROR.len)
+        g_c = random.randrange(0, len(constants.GAMES_HORROR))
         gamechoice = constants.GAMES_HORROR[g_c]
         return gamechoice
     elif genre == "craft":
-        g_c = random.randrange(0, constants.GAMES_CRAFT.len)
+        g_c = random.randrange(0, len(constants.GAMES_CRAFT))
         gamechoice = constants.GAMES_CRAFT[g_c]
         return gamechoice
     else:
-        gamelist = constants.GAMES_CHILL.append(constants.GAMES_CRAFT)
-        gamelist = gamelist.append(constants.GAMES_HORROR)
-        gamelist = gamelist.append(constants.GAMES_SHOOT)
-        g_c = random.randrange(0, gamelist.len)
+        gamelist = constants.GAMES_CHILL + constants.GAMES_CRAFT + constants.GAMES_HORROR + constants.GAMES_SHOOT
+        g_c = random.randrange(0, len(gamelist))
         gamechoice = gamelist[g_c]
         return gamechoice
 
@@ -135,11 +133,12 @@ async def on_message(message):
     # get a random game
     if message.content.startswith('!suggestgame'):
         suggestgame_args = message.content.split(" ")
-        if suggestgame_args.len < 2:
-            game = get_game()
+        if len(suggestgame_args) < 2:
+            game_details = get_game()
         else:
-            game = get_game(suggestgame_args[1])
-        await message.channel.send("")
+            game_details = get_game(suggestgame_args[1])
+        msg = "Try this game: " + game_details[0] + "\n" + constants.STEAMTEMPLATE + str(game_details[1])
+        await message.channel.send(msg)
 
     # todd
     if any(substring in message.content.lower() for substring in constants.TODDHOWARD):
