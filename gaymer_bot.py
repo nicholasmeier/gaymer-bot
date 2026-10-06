@@ -19,16 +19,32 @@ debug = True
 #
 ##
 
-"""
-def get_random_game(genre):
-    gamesfile = open("games.txt", "r")
-    game_lists = gamesfile.read().splitlines()
-    if genre == "" | genre == "all":
-        for game_list in game_lists:
-    elif genre == "horror":
-    elif genre == "cozy":
+
+def get_game(genre):
+    if genre == "chill":
+        g_c = random.randrange(0, constants.GAMES_CHILL.len)
+        gamechoice = constants.GAMES_CHILL[g_c]
+        return gamechoice
     elif genre == "shooter":
-"""     
+        g_c = random.randrange(0, constants.GAMES_SHOOT.len)
+        gamechoice = constants.GAMES_SHOOT[g_c]
+        return gamechoice
+    elif genre == "horror":
+        g_c = random.randrange(0, constants.GAMES_HORROR.len)
+        gamechoice = constants.GAMES_HORROR[g_c]
+        return gamechoice
+    elif genre == "craft":
+        g_c = random.randrange(0, constants.GAMES_CRAFT.len)
+        gamechoice = constants.GAMES_CRAFT[g_c]
+        return gamechoice
+    else:
+        gamelist = constants.GAMES_CHILL.append(constants.GAMES_CRAFT)
+        gamelist = gamelist.append(constants.GAMES_HORROR)
+        gamelist = gamelist.append(constants.GAMES_SHOOT)
+        g_c = random.randrange(0, gamelist.len)
+        gamechoice = gamelist[g_c]
+        return gamechoice
+
     
 def get_count(filename):
     countfile = open(filename, "r")
@@ -46,7 +62,9 @@ def update_count(filename, count):
 # Discord funcs  
 #  
 ##
-daily = datetime.time(hour=21, minute=37, second=0)
+
+# do a daily count at 5pm et
+daily = datetime.time(hour=21, minute=0, second=0)
 
 @tasks.loop(time=daily)
 async def counter():
@@ -84,7 +102,7 @@ async def on_message(message):
         return
     #get guild
     guild = client.get_guild(message.guild.id)
-    text_channel = client.get_channel(constants.DEV_TEST_ID).mention
+    text_channel = client.get_channel(constants.HORNYJAIL_ID).mention
 
     # help
     if message.content.startswith('!help'):
@@ -113,6 +131,15 @@ async def on_message(message):
     # give bear honey
     if message.content.startswith('!honey'):
         await message.channel.send("Thank you friend! Your honey is much appreciated", file=discord.File('imgs/sunbearhoney.jpg'))
+
+    # get a random game
+    if message.content.startswith('!suggestgame'):
+        suggestgame_args = message.content.split(" ")
+        if suggestgame_args.len < 2:
+            game = get_game()
+        else:
+            game = get_game(suggestgame_args[1])
+        await message.channel.send("")
 
     # todd
     if any(substring in message.content.lower() for substring in constants.TODDHOWARD):
