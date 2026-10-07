@@ -11,8 +11,7 @@ You will need
 ## ignored files
 - Some files I've got ignored cause i dont want private ids on a git repo
 - you'll need to populate a 
-    - constants.py
-    - token.txt
+    - constants.py (template is in repo as constants_template.py)
 
 
 ## This is very unserious
