@@ -19,6 +19,13 @@ debug = True
 #
 ##
 
+def get_role(guild, role_name):
+    if guild == "DMMESSAGE":
+        return -1
+    for role in guild.roles:
+        if role.name.lower() == role_name.lower():
+            return role
+    return -1
 
 def get_game(genre = None):
     if genre == "chill":
@@ -66,7 +73,7 @@ daily = datetime.time(hour=21, minute=0, second=0)
 
 @tasks.loop(time=daily)
 async def counter():
-    channel = client.get_channel(constants.DEV_TEST_ID)
+    channel = client.get_channel(constants.GENERAL_ID)
     # update counters
     msg_counter = 'Greetings! Here is the daily counter update:\n'
     ## Bonk counter
@@ -99,12 +106,20 @@ async def on_message(message):
     if message.author == client.user:
         return
     #get guild
-    guild = client.get_guild(message.guild.id)
+    if message.guild:
+        guild = client.get_guild(message.guild.id)
+    else:
+        guild = "DMMESSAGE"
     text_channel = client.get_channel(constants.HORNYJAIL_ID).mention
 
     # help
-    if message.content.startswith('!help'):
-        await message.channel.send("Greetings, I am the big gay bear (specifically I am a bisexual sun bear).\nUse !bonk <@user> to send someone to horny jail.\nUse !daycount to see how long since the last incident.\nUse !honey to give me a treat :)")
+    if message.content.startswith('!about'):
+        await message.channel.send("Greetings, I am the big gay bear (specifically I am a bisexual sun bear).\nUse !daycount to see how long since the last incident.\nUse !honey to give me a treat :)\nUse !commandsall to get a full list of commands in your DMs")
+
+    # all commands
+    if message.content.startswith('!commandsall'):
+        a_chan = await message.author.create_dm()
+        await a_chan.send(constants.FULL_COMMAND_LIST)
 
     # bonk horny jail
     if message.content.startswith('!bonk'):
@@ -131,7 +146,7 @@ async def on_message(message):
         await message.channel.send("Thank you friend! Your honey is much appreciated", file=discord.File('imgs/sunbearhoney.jpg'))
 
     # get a random game
-    if message.content.startswith('!suggestgame'):
+    if message.content.startswith('!game'):
         suggestgame_args = message.content.split(" ")
         if len(suggestgame_args) < 2:
             game_details = get_game()
@@ -139,6 +154,26 @@ async def on_message(message):
             game_details = get_game(suggestgame_args[1])
         msg = "Try this game: " + game_details[0] + "\n" + constants.STEAMTEMPLATE + str(game_details[1])
         await message.channel.send(msg)
+
+    # give role
+    if message.content.startswith('!giverole'):
+        giverole_args = message.content.split(" ")
+        if len(giverole_args) < 2:
+            await message.channel.send("Sorry, you need to pick a role to give yourself.")
+        else:
+            rolename = giverole_args[1]
+            if len(giverole_args) > 2:
+                for i in range(2, len(giverole_args)):
+                    rolename = rolename + " " + giverole_args[i]
+            member = message.author
+            role = get_role(guild, rolename)
+            if giverole_args[1].lower() in constants.ADMINROLES:
+                await message.channel.send("Nice try bub! You get the tongue now >:P", file=discord.File("imgs/sunbeartongue.jpg"))
+            elif role != -1:
+                await member.add_roles(role)
+                await message.channel.send("Nice! You've been made into a {0}".format(role.name))
+            else:
+                await message.channel.send("Sorry, I can't find that role.", file=discord.File("imgs/sadsunbear.jpg"))
 
     # todd
     if any(substring in message.content.lower() for substring in constants.TODDHOWARD):
